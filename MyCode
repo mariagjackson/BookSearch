@@ -1,0 +1,498 @@
+
+// File Name:	BookSearch; JavaBookSearch
+// Programmer:	Maria Jackson
+// Date:        16/05/2023
+// Description:	This program demonstrates basic linear and binary search
+//              to find and display a children's book title from BookFile.txt.
+
+
+// Package, Class, Import, and Memory Requirements
+
+package jBookSearch;
+
+import java.io.File;
+import java.io.FileNotFoundException;
+import java.util.ArrayList;
+import java.util.Scanner;
+import javax.swing.JOptionPane;
+
+public class JavaBookSearch extends javax.swing.JFrame {
+
+     // Creates a new form called JavaBookSearch
+    public JavaBookSearch() {
+        initComponents();
+    }
+           
+    
+// FOR GOING ABOVE AND BEYOND: I used many try-catch blocks to ensure that only
+// integer values are entered, that the file exists, and that the book exists. 
+// In the case that any of these happen to not exist or improper input was entered, 
+// all text fields are cleared and an error pane pops up. 
+// I also added a clear button, buttons that allow for each search type to be 
+// done seperately, and one that does both at the same time for extra.
+    
+    
+// Function Requirements
+    
+// Linear Search Function
+private String linearSearch(String refNum) {   
+    
+    // Try-catch block to ensure the user entered an integer value
+    try { 
+        
+        // Tries to parse user input as an int
+        int userInput = Integer.parseInt(refNum);
+        
+        // Call file/store; scan call and store
+        File file = new File("/Users/mariajackson/NetBeansProjects/BookFile.txt");
+        Scanner scan = null;
+        
+        // Internal try-catch block to ensure the file exists; error handling
+        try {
+            
+            // New scan and store in variable if file exists 
+            scan = new Scanner(file);
+            
+            // Create local variable to store the book title that is to be 
+            // serached for/displayed
+            String bookName = "";
+            
+            // Set boolean flag to false; turn it true if the book is found
+            boolean found = false; 
+            
+            // Start of while loop; continues while there is still lines in the
+            //file
+            while (scan.hasNextLine()) {
+                
+                // Set variable line to whatever the next line in the file is
+                String line = scan.nextLine();
+                
+                // Check if the line is equal to the user input
+                if (line.equals(refNum)) {
+                
+                    // Set bookName variable to the next lines text
+                    bookName = scan.nextLine();
+                    
+                    // Set flag to true
+                    found = true;
+                    
+                    // Break from while loop
+                    break;
+                    }
+                }
+            
+            // If the book was found
+            if (found) {
+                linearTxt.setText(bookName);
+                
+            // If the book was not found, error pane and clearly all text fields
+            } else {
+                JOptionPane.showMessageDialog(null, "A book with that reference number could not be found in the file. Please input a different number.", "Error", JOptionPane.ERROR_MESSAGE);
+                linearTxt.setText("");
+                binaryTxt.setText("");
+                numTxt.setText("");
+            }
+            
+        // Handles if the file is not found (shouldn't be an issue, but here in
+        // just in case)
+        } catch (FileNotFoundException e) {
+            JOptionPane.showMessageDialog(null, "A file by the name of 'BookFile.txt' could not be located.", "Error", JOptionPane.ERROR_MESSAGE);
+            
+        // Lastly stop the scanning once the search is over/stop reading the 
+        // file
+        } finally {
+            if (scan != null) {
+                scan.close();
+            }
+        }
+    
+    // Error handles improper input from the user and clears text fields
+    } catch (NumberFormatException ex) {
+        
+        // If the user enters anything but an integer, an error message is displayed
+        JOptionPane.showMessageDialog(null, "Invalid input - only integer values are accepted.", "Error", JOptionPane.ERROR_MESSAGE);
+        numTxt.setText("");
+    }
+    
+        return null;
+}
+
+
+// Binary Search Function
+private String binarySearch(String refNum) { 
+    
+    // Try-catch block to ensure the user entered an integer value
+    try {
+        
+        // Tries to parse user input as an int
+        int userInput = Integer.parseInt(refNum);
+
+        // Call file/store; scan call and store
+        File file = new File("/Users/mariajackson/NetBeansProjects/BookFile.txt");
+        Scanner scan = null;
+
+        // Internal try-catch block to ensure the file exists; error handling
+        try {
+            
+            // New scan and store in variable if file exists
+            scan = new Scanner(file);
+
+            // New array lists to store all the reference numbers and book
+            // names
+            ArrayList<Integer> refNumbers = new ArrayList<>();
+            ArrayList<String> bookNames = new ArrayList<>();
+
+            // Read the file and add the proper values to the lists
+            while (scan.hasNextLine()) {
+                int number = Integer.parseInt(scan.nextLine());
+                refNumbers.add(number);
+                
+                // Skip the book title line
+                bookNames.add(scan.nextLine());
+            }
+
+            // Intilaize varaibles to track the lowest and highest indexes to
+            // find the middle later
+            int left = 0;
+            int right = refNumbers.size() - 1;
+
+            // While loop to begin search
+            while (left <= right) {
+                
+                // Initialize middle index variables
+                int mid = (left + right) / 2;
+                int midNum = refNumbers.get(mid);
+
+                // If the mid number matches the user input, display the book title
+                if (midNum == userInput) {
+                    
+                    // Find the corresponding book title line
+                    String bookName = bookNames.get(mid);
+                    binaryTxt.setText(bookName);
+                    return null;
+                    
+                // If its not the mid and high than the mid, move to the right
+                } else if (midNum < userInput) {
+                    left = mid + 1;
+                    
+                // If its lower than the mid move to the left
+                } else {
+                    right = mid - 1;
+                }
+            }
+
+            // If the book was not found, display an error message
+            JOptionPane.showMessageDialog(null, "A book with that reference number could not be found in the file. Please input a different number.", "Error", JOptionPane.ERROR_MESSAGE);
+            linearTxt.setText("");
+            binaryTxt.setText("");
+            numTxt.setText("");
+
+        // Handles if the file isn't found; should not be an issue though
+        } catch (FileNotFoundException e) {
+            JOptionPane.showMessageDialog(null, "A file by the name of 'BookFile.txt' could not be located.", "Error", JOptionPane.ERROR_MESSAGE);
+        
+        // Lastly, close scanner
+        } finally {
+            if (scan != null) {
+                scan.close();
+            }
+        }
+  
+    // Handles if a non-integer value is entered
+    } catch (NumberFormatException ex) {
+        
+        // If the user enters anything but an integer, display an error message
+        JOptionPane.showMessageDialog(null, "Invalid input - only integer values are accepted.", "Error", JOptionPane.ERROR_MESSAGE);
+        numTxt.setText("");
+    }
+
+    return null; 
+}
+
+
+    // NetBeans generated code for form design; not to be modified
+    @SuppressWarnings("unchecked")
+    // <editor-fold defaultstate="collapsed" desc="Generated Code">                          
+    private void initComponents() {
+
+        BackgroundColourPanel = new javax.swing.JPanel();
+        titleLabel = new javax.swing.JLabel();
+        summaryLabel1 = new javax.swing.JLabel();
+        summaryLabel2 = new javax.swing.JLabel();
+        promptLabel = new javax.swing.JLabel();
+        numTxt = new javax.swing.JTextField();
+        searchBtn = new javax.swing.JButton();
+        clearBtn = new javax.swing.JButton();
+        linearLabel = new javax.swing.JLabel();
+        binaryLabel = new javax.swing.JLabel();
+        linearTxt = new javax.swing.JTextField();
+        binaryTxt = new javax.swing.JTextField();
+        linSearch = new javax.swing.JButton();
+        binarySearch = new javax.swing.JButton();
+
+        setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
+        setTitle("BookSearchForm");
+
+        BackgroundColourPanel.setBackground(new java.awt.Color(227, 225, 255));
+
+        titleLabel.setFont(new java.awt.Font("Yuppy TC", 1, 24)); // NOI18N
+        titleLabel.setText("BOOK SEARCH: Children's Classics");
+
+        summaryLabel1.setFont(new java.awt.Font("Yuppy SC", 1, 13)); // NOI18N
+        summaryLabel1.setText("Enter the reference number of the book you are looking for, and the ");
+
+        summaryLabel2.setFont(new java.awt.Font("Yuppy SC", 0, 13)); // NOI18N
+        summaryLabel2.setText("program will use both linear and binary search to locate it.");
+
+        promptLabel.setFont(new java.awt.Font("Yuppy SC", 1, 18)); // NOI18N
+        promptLabel.setText("Enter the reference # here:");
+
+        numTxt.setBackground(new java.awt.Color(247, 246, 255));
+        numTxt.setFont(new java.awt.Font("Yuppy SC", 0, 14)); // NOI18N
+
+        searchBtn.setBackground(new java.awt.Color(247, 246, 255));
+        searchBtn.setFont(new java.awt.Font("Yuppy SC", 0, 12)); // NOI18N
+        searchBtn.setText("Search Both");
+        searchBtn.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                searchBtnActionPerformed(evt);
+            }
+        });
+
+        clearBtn.setBackground(new java.awt.Color(247, 246, 255));
+        clearBtn.setFont(new java.awt.Font("Yuppy SC", 0, 12)); // NOI18N
+        clearBtn.setText("Clear");
+        clearBtn.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                clearBtnActionPerformed(evt);
+            }
+        });
+
+        linearLabel.setFont(new java.awt.Font("Yuppy SC", 0, 14)); // NOI18N
+        linearLabel.setText("Linear Search:");
+
+        binaryLabel.setFont(new java.awt.Font("Yuppy SC", 0, 14)); // NOI18N
+        binaryLabel.setText("Binary Search:");
+
+        linearTxt.setEditable(false);
+        linearTxt.setBackground(new java.awt.Color(247, 246, 255));
+
+        binaryTxt.setEditable(false);
+        binaryTxt.setBackground(new java.awt.Color(247, 246, 255));
+
+        linSearch.setBackground(new java.awt.Color(247, 246, 255));
+        linSearch.setFont(new java.awt.Font("Yuppy SC", 0, 12)); // NOI18N
+        linSearch.setText("Linear Search");
+        linSearch.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                linSearchActionPerformed(evt);
+            }
+        });
+
+        binarySearch.setBackground(new java.awt.Color(247, 246, 255));
+        binarySearch.setFont(new java.awt.Font("Yuppy SC", 0, 12)); // NOI18N
+        binarySearch.setText("Binary Search");
+        binarySearch.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                binarySearchActionPerformed(evt);
+            }
+        });
+
+        javax.swing.GroupLayout BackgroundColourPanelLayout = new javax.swing.GroupLayout(BackgroundColourPanel);
+        BackgroundColourPanel.setLayout(BackgroundColourPanelLayout);
+        BackgroundColourPanelLayout.setHorizontalGroup(
+            BackgroundColourPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(BackgroundColourPanelLayout.createSequentialGroup()
+                .addGroup(BackgroundColourPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addGroup(BackgroundColourPanelLayout.createSequentialGroup()
+                        .addGap(42, 42, 42)
+                        .addComponent(titleLabel))
+                    .addGroup(BackgroundColourPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING, false)
+                        .addGroup(BackgroundColourPanelLayout.createSequentialGroup()
+                            .addGap(19, 19, 19)
+                            .addGroup(BackgroundColourPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                                .addGroup(BackgroundColourPanelLayout.createSequentialGroup()
+                                    .addComponent(binarySearch, javax.swing.GroupLayout.PREFERRED_SIZE, 105, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                    .addGap(18, 18, 18)
+                                    .addComponent(linSearch, javax.swing.GroupLayout.PREFERRED_SIZE, 105, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                    .addGap(18, 18, 18)
+                                    .addComponent(searchBtn)
+                                    .addGap(18, 18, 18)
+                                    .addComponent(clearBtn, javax.swing.GroupLayout.PREFERRED_SIZE, 80, javax.swing.GroupLayout.PREFERRED_SIZE))
+                                .addGroup(BackgroundColourPanelLayout.createSequentialGroup()
+                                    .addGap(25, 25, 25)
+                                    .addGroup(BackgroundColourPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
+                                        .addComponent(linearLabel)
+                                        .addComponent(binaryLabel))
+                                    .addGap(18, 18, 18)
+                                    .addGroup(BackgroundColourPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                                        .addComponent(binaryTxt, javax.swing.GroupLayout.PREFERRED_SIZE, 279, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                        .addComponent(linearTxt, javax.swing.GroupLayout.PREFERRED_SIZE, 279, javax.swing.GroupLayout.PREFERRED_SIZE)))
+                                .addGroup(BackgroundColourPanelLayout.createSequentialGroup()
+                                    .addGap(52, 52, 52)
+                                    .addComponent(summaryLabel2))))
+                        .addGroup(javax.swing.GroupLayout.Alignment.LEADING, BackgroundColourPanelLayout.createSequentialGroup()
+                            .addGap(42, 42, 42)
+                            .addGroup(BackgroundColourPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
+                                .addGroup(BackgroundColourPanelLayout.createSequentialGroup()
+                                    .addComponent(promptLabel)
+                                    .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                                    .addComponent(numTxt, javax.swing.GroupLayout.PREFERRED_SIZE, 142, javax.swing.GroupLayout.PREFERRED_SIZE))
+                                .addComponent(summaryLabel1)))))
+                .addContainerGap(15, Short.MAX_VALUE))
+        );
+        BackgroundColourPanelLayout.setVerticalGroup(
+            BackgroundColourPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(BackgroundColourPanelLayout.createSequentialGroup()
+                .addGap(18, 18, 18)
+                .addComponent(titleLabel)
+                .addGap(18, 18, 18)
+                .addComponent(summaryLabel1)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addComponent(summaryLabel2)
+                .addGap(35, 35, 35)
+                .addGroup(BackgroundColourPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                    .addComponent(promptLabel)
+                    .addComponent(numTxt, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                .addGap(33, 33, 33)
+                .addGroup(BackgroundColourPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                    .addComponent(binarySearch, javax.swing.GroupLayout.PREFERRED_SIZE, 31, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(linSearch, javax.swing.GroupLayout.PREFERRED_SIZE, 31, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(searchBtn, javax.swing.GroupLayout.PREFERRED_SIZE, 31, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(clearBtn, javax.swing.GroupLayout.PREFERRED_SIZE, 31, javax.swing.GroupLayout.PREFERRED_SIZE))
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 38, Short.MAX_VALUE)
+                .addGroup(BackgroundColourPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                    .addComponent(linearTxt, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(linearLabel))
+                .addGap(18, 18, 18)
+                .addGroup(BackgroundColourPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                    .addComponent(binaryTxt, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(binaryLabel))
+                .addGap(30, 30, 30))
+        );
+
+        javax.swing.GroupLayout layout = new javax.swing.GroupLayout(getContentPane());
+        getContentPane().setLayout(layout);
+        layout.setHorizontalGroup(
+            layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addComponent(BackgroundColourPanel, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+        );
+        layout.setVerticalGroup(
+            layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addComponent(BackgroundColourPanel, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+        );
+
+        pack();
+    }// </editor-fold>                        
+
+    
+// Code for all buttons
+    
+// "Search" button code
+    private void searchBtnActionPerformed(java.awt.event.ActionEvent evt) {                                          
+    
+    // Get the reference number entered by the user
+    String refNum = numTxt.getText();
+    
+    // Call the linearSearch function and the binarySearch function
+    linearSearch(refNum);
+    binarySearch(refNum);
+    
+    }                                         
+
+
+// "Clear" button code
+    private void clearBtnActionPerformed(java.awt.event.ActionEvent evt) {                                         
+        
+    // Just clear all text fields
+    binaryTxt.setText("");
+    linearTxt.setText("");
+    numTxt.setText("");
+        
+    }                                        
+
+    
+// "Binary Search" button
+    private void binarySearchActionPerformed(java.awt.event.ActionEvent evt) {                                             
+       
+    // Get the reference number entered by the user
+    String refNum = numTxt.getText();
+    
+    // Call the linearSearch function and the binarySearch function
+    binarySearch(refNum);
+    
+    // Clear unncessary field
+    linearTxt.setText("");
+        
+    }                                            
+
+    
+// "Linear Search" button
+    private void linSearchActionPerformed(java.awt.event.ActionEvent evt) {                                          
+    
+    // Get the reference number entered by the user
+    String refNum = numTxt.getText();
+    
+    // Call the linearSearch function and the binarySearch function
+    linearSearch(refNum);
+    
+    // Clear unncessary field
+    binaryTxt.setText("");
+    
+    }                                         
+
+    
+    // NetBeans generated code, @param args the command line arguments 
+    public static void main(String args[]) {
+        /* Set the Nimbus look and feel */
+        //<editor-fold defaultstate="collapsed" desc=" Look and feel setting code (optional) ">
+        /* If Nimbus (introduced in Java SE 6) is not available, stay with the default look and feel.
+         * For details see http://download.oracle.com/javase/tutorial/uiswing/lookandfeel/plaf.html 
+         */
+        try {
+            for (javax.swing.UIManager.LookAndFeelInfo info : javax.swing.UIManager.getInstalledLookAndFeels()) {
+                if ("Nimbus".equals(info.getName())) {
+                    javax.swing.UIManager.setLookAndFeel(info.getClassName());
+                    break;
+                }
+            }
+        } catch (ClassNotFoundException ex) {
+            java.util.logging.Logger.getLogger(JavaBookSearch.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
+        } catch (InstantiationException ex) {
+            java.util.logging.Logger.getLogger(JavaBookSearch.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
+        } catch (IllegalAccessException ex) {
+            java.util.logging.Logger.getLogger(JavaBookSearch.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
+        } catch (javax.swing.UnsupportedLookAndFeelException ex) {
+            java.util.logging.Logger.getLogger(JavaBookSearch.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
+        }
+        //</editor-fold>
+
+        /* Create and display the form */
+        java.awt.EventQueue.invokeLater(new Runnable() {
+            public void run() {
+                new JavaBookSearch().setVisible(true);
+            }
+        });
+    }
+
+    
+// NetBeans generated variables; not to be modfied   
+    // Variables declaration - do not modify                     
+    private javax.swing.JPanel BackgroundColourPanel;
+    private javax.swing.JLabel binaryLabel;
+    private javax.swing.JButton binarySearch;
+    private javax.swing.JTextField binaryTxt;
+    private javax.swing.JButton clearBtn;
+    private javax.swing.JButton linSearch;
+    private javax.swing.JLabel linearLabel;
+    private javax.swing.JTextField linearTxt;
+    private javax.swing.JTextField numTxt;
+    private javax.swing.JLabel promptLabel;
+    private javax.swing.JButton searchBtn;
+    private javax.swing.JLabel summaryLabel1;
+    private javax.swing.JLabel summaryLabel2;
+    private javax.swing.JLabel titleLabel;
+    // End of variables declaration                   
+}
+
+// End of code
